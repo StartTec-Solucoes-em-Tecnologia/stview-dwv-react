@@ -1,0 +1,15 @@
+#dwv {
+  @apply h-[100vh] p-10;
+}
+
+.layerGroup {
+  @apply relative p-0 flex justify-center h-[100%];
+}
+
+.layer {
+  @apply absolute pointer-events-none;
+}
+
+.drawDiv {
+  @apply absolute pointer-events-none;
+}
