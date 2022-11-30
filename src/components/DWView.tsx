@@ -8,12 +8,12 @@ import { ToolButton } from './ToolButton'
 
 import './DWView.css'
 
-// dwv.image.decoderScripts = {
-//   jpeg2000: 'assets/dwv/decoders/pdfjs/decode-jpeg2000.js',
-//   'jpeg-lossless': 'assets/dwv/decoders/rii-mango/decode-jpegloss.js',
-//   'jpeg-baseline': 'assets/dwv/decoders/pdfjs/decode-jpegbaseline.js',
-//   rle: 'assets/dwv/decoders/dwv/decode-rle.js'
-// }
+dwv.image.decoderScripts = {
+  jpeg2000: 'assets/dwv/decoders/pdfjs/decode-jpeg2000.js',
+  'jpeg-lossless': 'assets/dwv/decoders/rii-mango/decode-jpegloss.js',
+  'jpeg-baseline': 'assets/dwv/decoders/pdfjs/decode-jpegbaseline.js',
+  rle: 'assets/dwv/decoders/dwv/decode-rle.js'
+}
 
 const tools = {
   Scroll: {},
@@ -56,7 +56,11 @@ const drawToolsLabels: Record<string, string> = {
   Ellipse: 'Seleção elíptica'
 }
 
-export function DWView () {
+interface DWViewProps {
+  urls: string[]
+}
+
+export function DWView ({ urls }: DWViewProps) {
   const [toolNames, setToolNames] = useState<Array<keyof typeof tools>>([])
   const [selectedTool, setSelectedTool] = useState<string>()
   const [loadProgress, setLoadProgress] = useState(0)
@@ -65,18 +69,20 @@ export function DWView () {
   const [metaData, setMetaData] = useState([])
 
   const onChangeShape = (app: any, shape: string) => {
-    app?.setDrawShape([shape])
+    app?.setDrawShape(shape)
   }
 
   const handleChangeTool = useCallback((app: any, tool: string, drawShape?: string) => {
     if (app) {
+      console.log('Changing tool: ', { tool, drawShape })
+
       if (drawShape) {
         setSelectedTool([tool, drawShape].join('/'))
       } else {
         setSelectedTool(tool)
       }
 
-      app?.setTool(tool)
+      app.setTool(tool)
 
       if (tool === 'Draw') {
         onChangeShape(app, drawShape ?? tools.Draw.options[0])
@@ -183,8 +189,8 @@ export function DWView () {
 
     setDWVApp(app)
 
-    dwv.utils.loadFromUri(window.location.href, app)
-  }, [dwvApp, handleChangeTool])
+    app.loadURLs(urls)
+  }, [dwvApp, handleChangeTool, urls])
 
   return (
     <div className="flex">
